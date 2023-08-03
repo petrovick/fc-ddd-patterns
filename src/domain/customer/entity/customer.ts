@@ -1,3 +1,4 @@
+import CustomerCreatedEvent from "../event/customer-created.event";
 import Address from "../value-object/address";
 
 export default class Customer {

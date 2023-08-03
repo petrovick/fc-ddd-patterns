@@ -1,3 +1,7 @@
+import Customer from "../../customer/entity/customer";
+import CustomerCreatedEvent from "../../customer/event/customer-created.event";
+import SendConsoleLog1Handler from "../../customer/event/handler/send-console-log-1-.handler";
+import SendConsoleLog2Handler from "../../customer/event/handler/send-console-log-2-.handler";
 import SendEmailWhenProductIsCreatedHandler from "../../product/event/handler/send-email-when-product-is-created.handler";
 import ProductCreatedEvent from "../../product/event/product-created.event";
 import EventDispatcher from "./event-dispatcher";
@@ -76,6 +80,44 @@ describe("Domain events tests", () => {
 
     // Quando o notify for executado o SendEmailWhenProductIsCreatedHandler.handle() deve ser chamado
     eventDispatcher.notify(productCreatedEvent);
+
+    expect(spyEventHandler).toHaveBeenCalled();
+  });
+
+  it("should notify CustomerCreated Log1 event handler", () => {
+    const eventDispatcher = new EventDispatcher();
+    const eventHandler = new SendConsoleLog1Handler();
+    const spyEventHandler = jest.spyOn(eventHandler, "handle");
+
+    eventDispatcher.register("CustomerCreatedEvent", eventHandler);
+
+    expect(
+      eventDispatcher.getEventHandlers["CustomerCreatedEvent"][0]
+    ).toMatchObject(eventHandler);
+
+    const customerCreatedEvent = new CustomerCreatedEvent(new Customer('123', 'Costumer 1'));
+
+    // Quando o notify for executado o SendEmailWhenProductIsCreatedHandler.handle() deve ser chamado
+    eventDispatcher.notify(customerCreatedEvent);
+
+    expect(spyEventHandler).toHaveBeenCalled();
+  });
+
+  it("should notify CustomerCreated Log2 event handler", () => {
+    const eventDispatcher = new EventDispatcher();
+    const eventHandler = new SendConsoleLog2Handler();
+    const spyEventHandler = jest.spyOn(eventHandler, "handle");
+
+    eventDispatcher.register("CustomerCreatedEvent", eventHandler);
+
+    expect(
+      eventDispatcher.getEventHandlers["CustomerCreatedEvent"][0]
+    ).toMatchObject(eventHandler);
+
+    const customerCreatedEvent = new CustomerCreatedEvent(new Customer('1234', 'Costumer 2'));
+
+    // Quando o notify for executado o SendEmailWhenProductIsCreatedHandler.handle() deve ser chamado
+    eventDispatcher.notify(customerCreatedEvent);
 
     expect(spyEventHandler).toHaveBeenCalled();
   });
