@@ -1,7 +1,10 @@
 import Customer from "../../customer/entity/customer";
+import CustomerChangedAddressEvent from "../../customer/event/customer-changed-address.event";
 import CustomerCreatedEvent from "../../customer/event/customer-created.event";
+import CustomerChangedAddressEventHandler from "../../customer/event/handler/customer-changed-address-event.handler";
 import SendConsoleLog1Handler from "../../customer/event/handler/send-console-log-1-.handler";
 import SendConsoleLog2Handler from "../../customer/event/handler/send-console-log-2-.handler";
+import Address from "../../customer/value-object/address";
 import SendEmailWhenProductIsCreatedHandler from "../../product/event/handler/send-email-when-product-is-created.handler";
 import ProductCreatedEvent from "../../product/event/product-created.event";
 import EventDispatcher from "./event-dispatcher";
@@ -115,6 +118,28 @@ describe("Domain events tests", () => {
     ).toMatchObject(eventHandler);
 
     const customerCreatedEvent = new CustomerCreatedEvent(new Customer('1234', 'Costumer 2'));
+
+    // Quando o notify for executado o SendEmailWhenProductIsCreatedHandler.handle() deve ser chamado
+    eventDispatcher.notify(customerCreatedEvent);
+
+    expect(spyEventHandler).toHaveBeenCalled();
+  });
+  
+
+  it("should notify customer changed address event handler", () => {
+    const eventDispatcher = new EventDispatcher();
+    const eventHandler = new CustomerChangedAddressEventHandler();
+    const spyEventHandler = jest.spyOn(eventHandler, "handle");
+
+    eventDispatcher.register("CustomerChangedAddressEvent", eventHandler);
+
+    expect(
+      eventDispatcher.getEventHandlers["CustomerChangedAddressEvent"][0]
+    ).toMatchObject(eventHandler);
+
+    const customer = new Customer('123', 'Costumer 1');
+    customer.Address = new Address("72 Faxcol", 123, "12345-000", "Gotham City");
+    const customerCreatedEvent = new CustomerChangedAddressEvent(customer);
 
     // Quando o notify for executado o SendEmailWhenProductIsCreatedHandler.handle() deve ser chamado
     eventDispatcher.notify(customerCreatedEvent);
